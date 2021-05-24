@@ -38,10 +38,54 @@ type MachineReconciler struct {
 // +kubebuilder:rbac:groups=useless.my.domain,resources=machines/status,verbs=get;update;patch
 
 func (r *MachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("machine", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("machine", req.NamespacedName)
 
 	// your logic here
+	var machine uselessv1.Machine
+
+	if err := r.Get(ctx, req.NamespacedName, &machine); err != nil {
+		log.Info("Something went wrong while trying to get the resource", "name", req.NamespacedName)
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	if machine.Status.Status == "" {
+		machine.Status.Status = "HOWDY"
+	}
+
+	if err := r.Status().Update(ctx, &machine); err != nil {
+		log.Info("Something went wrong while trying to update the resource", "name", req.NamespacedName)
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	if machine.Status.Status == "OK" {
+		return ctrl.Result{}, nil
+	}
+
+	if machine.Status.Status == "DELETE" {
+		if err := r.Delete(ctx, &machine); err != nil {
+			log.Info("Something went wrong while trying to delete the resource", "name", req.NamespacedName)
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
+
+		log.Info("The Useless Machine has been DELETED!", "name", req.NamespacedName)
+		return ctrl.Result{}, nil
+	}
+
+	mtype := machine.Spec.MachineType
+	switch mtype {
+	case "useful":
+		machine.Status.Status = "OK"
+	case "useless":
+		machine.Status.Status = "DELETE"
+	}
+
+	if err := r.Status().Update(ctx, &machine); err != nil {
+		log.Info("Something went wrong while trying to update the resource", "name", req.NamespacedName)
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	log.Info("Hello from machine ctrl", "name", req.NamespacedName)
 
 	return ctrl.Result{}, nil
 }
