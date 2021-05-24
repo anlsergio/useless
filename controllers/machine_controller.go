@@ -18,6 +18,9 @@ package controllers
 
 import (
 	"context"
+	"math/rand"
+	"strings"
+	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -78,6 +81,28 @@ func (r *MachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		machine.Status.Status = "OK"
 	case "useless":
 		machine.Status.Status = "DELETE"
+	case "cheeky":
+		r := "o"
+		s := `\`
+
+		if len(machine.Status.Status) > 10 {
+			machine.Status.Status = strings.Trim(machine.Status.Status[0:10], " ")
+		}
+
+		if machine.Status.Status == "HOWDY" {
+			machine.Status.Status = r
+			break
+		}
+
+		if machine.Status.Status == fill(10, r) {
+			time.Sleep(time.Second)
+			machine.Status.Status = "DELETE"
+			break
+		}
+
+		time.Sleep(time.Millisecond * 500)
+		machine.Status.Status = fill(plusminus(len(machine.Status.Status)), r)
+		machine.Status.Status = machine.Status.Status + fill(10-len(machine.Status.Status), " ") + s
 	}
 
 	if err := r.Status().Update(ctx, &machine); err != nil {
@@ -94,4 +119,31 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&uselessv1.Machine{}).
 		Complete(r)
+}
+
+func fill(n int, c string) string {
+	r := ""
+	for i := 0; i < n; i++ {
+		r += c
+	}
+	return r
+}
+
+func plusminus(counter int) int {
+	if counter == 0 {
+		return 1
+	}
+
+	if counter == 1 {
+		return 2
+	}
+
+	n := rand.Intn(2)
+
+	if n == 0 {
+		n = -1
+	}
+
+	n += counter
+	return n
 }

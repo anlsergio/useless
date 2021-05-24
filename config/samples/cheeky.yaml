@@ -1,0 +1,7 @@
+apiVersion: useless.my.domain/v1
+kind: Machine
+metadata:
+  name: cheeky-machine
+spec:
+  # Add fields here
+  machinetype: cheeky
