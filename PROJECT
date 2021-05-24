@@ -1,0 +1,7 @@
+domain: my.domain
+repo: useless
+resources:
+- group: useless
+  kind: Machine
+  version: v1
+version: "2"

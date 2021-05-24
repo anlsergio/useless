@@ -1,0 +1,7 @@
+apiVersion: useless.my.domain/v1
+kind: Machine
+metadata:
+  name: machine-sample
+spec:
+  # Add fields here
+  foo: bar
