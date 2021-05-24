@@ -8,6 +8,13 @@ metadata:
   creationTimestamp: null
   name: machines.useless.my.domain
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.machinetype
+    name: machinetype
+    type: string
+  - JSONPath: .status.status
+    name: status
+    type: string
   group: useless.my.domain
   names:
     kind: Machine
@@ -15,6 +22,8 @@ spec:
     plural: machines
     singular: machine
   scope: Namespaced
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       description: Machine is the Schema for the machines API
@@ -34,13 +43,19 @@ spec:
         spec:
           description: MachineSpec defines the desired state of Machine
           properties:
-            foo:
+            machinetype:
               description: Foo is an example field of Machine. Edit Machine_types.go
                 to remove/update
               type: string
           type: object
         status:
           description: MachineStatus defines the observed state of Machine
+          properties:
+            status:
+              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                of cluster Important: Run "make" to regenerate code after modifying
+                this file'
+              type: string
           type: object
       type: object
   version: v1

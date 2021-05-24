@@ -1,7 +1,7 @@
 apiVersion: useless.my.domain/v1
 kind: Machine
 metadata:
-  name: machine-sample
+  name: useful-machine
 spec:
   # Add fields here
-  foo: bar
+  machinetype: useful

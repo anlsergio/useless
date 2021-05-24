@@ -29,16 +29,20 @@ type MachineSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of Machine. Edit Machine_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	MachineType string `json:"machinetype,omitempty"`
 }
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Status string `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:printcolumn:name="machinetype",type=string,JSONPath=`.spec.machinetype`
+// +kubebuilder:printcolumn:name="status",type=string,JSONPath=`.status.status`
+// +kubebuilder:subresource:status
 
 // Machine is the Schema for the machines API
 type Machine struct {
